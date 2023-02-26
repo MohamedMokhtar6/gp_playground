@@ -257,7 +257,6 @@ if __name__ == "__main__":
                 st.write(df.head())
                 same_id = sim_id(n_rows, n_coloumn, n_class,
                                  df_size, std, mean)
-                st.write(same_id)
                 data_ref = pd.read_csv(str(same_id)+'.csv', header=None)
                 data_ref = data_ref.iloc[1:11, :]
                 models = data_ref.to_numpy()
