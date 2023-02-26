@@ -214,7 +214,7 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
 
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
-        "choise your Data", ('Make your Data', 'Upload your CSV file', 'Boot'))
+        "choise your Data", ('Make your Data', 'Upload your CSV file', 'Bot'))
     if choise_data == 'Make your Data':
         (
             dataset,
@@ -241,7 +241,7 @@ if __name__ == "__main__":
             train_noise,
             test_noise,
         )
-    elif choise_data == 'Boot':
+    elif choise_data == 'Bot':
         data_set = upload_data()
         if data_set is not None:
             df = pd.read_csv(data_set)

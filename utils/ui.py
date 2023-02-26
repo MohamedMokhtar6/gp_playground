@@ -37,7 +37,8 @@ def introduction():
 def dataset_selector():
     dataset_container = st.sidebar.expander("Configure a dataset", True)
     with dataset_container:
-        dataset = st.selectbox("Choose a dataset", ("moons", "circles", "blobs"))
+        dataset = st.selectbox(
+            "Choose a dataset", ("moons", "circles", "blobs"))
         n_samples = st.number_input(
             "Number of samples",
             min_value=50,
@@ -79,7 +80,7 @@ def model_selector():
                 "Decision Tree",
                 "Random Forest",
                 "Gradient Boosting",
-                "Neural Network",
+                # "Neural Network",
                 "K Nearest Neighbors",
                 "Gaussian Naive Bayes",
                 "SVC",
@@ -146,7 +147,6 @@ def generate_snippet(
         train_data_def = f"x_train, y_train = make_blobs(n_samples={n_samples}, clusters=2, noise={train_noise* 47 + 0.57})"
         test_data_def = f"x_test, y_test = make_blobs(n_samples={n_samples // 2}, clusters=2, noise={test_noise* 47 + 0.57})"
 
-
     snippet = f"""
     >>> {dataset_import}
     >>> {model_import}
@@ -173,7 +173,6 @@ def generate_data_snippet(
     model_text_rep = repr(model)
     model_import = model_imports[model_type]
 
-
     snippet = f"""
     >>> 
     >>> {model_import}
@@ -199,9 +198,9 @@ def generate_data_snippet(
     """
     return snippet
 
+
 def polynomial_degree_selector():
     return st.sidebar.number_input("Highest polynomial degree", 1, 10, 1, 1)
-
 
 
 def upload_data():
@@ -209,4 +208,3 @@ def upload_data():
         uploaded_file = st.sidebar.file_uploader(
             "Upload your input CSV file", type=["csv"])
     return uploaded_file
-
