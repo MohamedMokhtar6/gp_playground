@@ -357,8 +357,10 @@ def pre_proses_data(df):
 def sim_id(n_rows, n_coloumn, n_class, df_size, std, mean):
     dataf = pd.read_csv('datasets.csv', header=None)
     datasets = dataf.to_numpy()
-    max_id = 0
-    max_score = 0
+    max_id = []
+    max_score = [0,]
+    n = -1
+    max_id2 = []
     for dataset in datasets:
         score = 0
         (id, num_class, num_row, nm_col, dataSiz, data_mean, data_std) = dataset
@@ -380,13 +382,18 @@ def sim_id(n_rows, n_coloumn, n_class, df_size, std, mean):
             score += 1
         if (stddd > 0.6 and stddd < 1.4):
             score += 1
-        if max_score >= score:
+        if max_score[-1] > score:
             max_score = max_score
             max_id = max_id
         else:
-            max_score = score
-            max_id = id
-    return int(max_id)
+            max_score .append(score)
+            max_id .append(int(id))
+    for i in max_score:
+        if i == max(max_score):
+            max_id2.append(max_id[n])
+        n += 1
+
+    return (max_id2)
 
 
 def best_data(models, new_data):

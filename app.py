@@ -244,6 +244,8 @@ if __name__ == "__main__":
     elif choise_data == 'Bot':
         data_set = upload_data()
         if data_set is not None:
+            selected_var = []
+            t = []
             df = pd.read_csv(data_set)
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
@@ -257,12 +259,18 @@ if __name__ == "__main__":
                 st.write(df.head())
                 same_id = sim_id(n_rows, n_coloumn, n_class,
                                  df_size, std, mean)
-                data_ref = pd.read_csv(str(same_id)+'.csv', header=None)
-                data_ref = data_ref.iloc[1:11, :]
-                models = data_ref.to_numpy()
-                selected_var = best_data(models, df)
+                st.write(same_id)
+                for i in same_id:
+                    data_ref = pd.read_csv(str(i)+'.csv', header=None)
+                    data_ref = data_ref.iloc[1:11, :]
+                    models = data_ref.to_numpy()
+                    selected_var.append(best_data(models, df))
+                selected_var = sorted(
+                    selected_var, key=lambda x: x[16], reverse=True)
+                st.dataframe(selected_var)
+                t = selected_var[0]
                 (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
-                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = selected_var
+                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = t
                 a = []
                 temp = {}
                 array = [model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
@@ -271,7 +279,7 @@ if __name__ == "__main__":
                      'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
                 a.append(b)
                 a.append(array)
-                data = dict(zip(b, selected_var))
+                data = dict(zip(b, t))
                 for x, y in data.items():
                     if y != '0' and y != '0.0':
                         temp[x] = y
