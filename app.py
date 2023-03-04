@@ -2,6 +2,7 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 from sklearn.datasets import load_diabetes
+import plost
 
 from utils.functions import *
 
@@ -214,7 +215,7 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
 
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
-        "choise your Data", ('Make your Data', 'Upload your CSV file', 'Bot'))
+        "choise your Data", ('Make your Data', 'Upload your CSV file', 'slim_Bot', 'Bruteforce_Bot'))
     if choise_data == 'Make your Data':
         (
             dataset,
@@ -241,14 +242,17 @@ if __name__ == "__main__":
             train_noise,
             test_noise,
         )
-    elif choise_data == 'Bot':
+    elif choise_data == 'slim_Bot':
         data_set = upload_data()
         if data_set is not None:
             selected_var = []
-            t = []
+            temp = {}
+            names = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
+                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
             df = pd.read_csv(data_set)
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
+
             size = data_set.getvalue()
             df_size = len(size)
             (n_rows, n_coloumn, n_class) = data_shape(df)
@@ -259,31 +263,95 @@ if __name__ == "__main__":
                 st.write(df.head())
                 same_id = sim_id(n_rows, n_coloumn, n_class,
                                  df_size, std, mean)
-                st.write(same_id)
                 for i in same_id:
                     data_ref = pd.read_csv(str(i)+'.csv', header=None)
                     data_ref = data_ref.iloc[1:11, :]
                     models = data_ref.to_numpy()
                     selected_var.append(best_data(models, df))
-                selected_var = sorted(
-                    selected_var, key=lambda x: x[16], reverse=True)
-                st.dataframe(selected_var)
-                t = selected_var[0]
+                selected_var = two_arr(selected_var)
+                df = pd.DataFrame(selected_var, columns=['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
+                                                         'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel', "train_accuracy", "train_f1", "test_accuracy", "test_f1", "duration"])
+                st.dataframe(df)
+                df = df.drop_duplicates(['model'])
+
+                plost.bar_chart(
+                    data=df,
+                    bar='model',
+                    value=('test_accuracy'),
+                    group='value',
+                    color='model',
+                    direction='horizontal'
+                )
+                plost.pie_chart(
+                    data=df,
+                    theta='duration',
+                    color='model')
+
+                best_one = selected_var[1]
                 (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
-                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = t
-                a = []
-                temp = {}
-                array = [model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
-                         metric, solver, penalty, C, max_iter, kernel]
-                b = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
-                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
-                a.append(b)
-                a.append(array)
-                data = dict(zip(b, t))
+                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = best_one
+                data = dict(zip(names, best_one))
                 for x, y in data.items():
                     if y != '0' and y != '0.0':
                         temp[x] = y
+                st.table(temp)
+                boot_body(model, train_accuracy, test_accuracy,
+                          train_f1, test_f1, duration)
 
+        else:
+            st.info('Awaiting for CSV file to be uploaded.')
+    elif choise_data == 'Bruteforce_Bot':
+        data_set = upload_data()
+        if data_set is not None:
+            selected_var = []
+            temp = {}
+            names = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
+                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
+            df = pd.read_csv(data_set)
+            st.subheader(' Glimpse of dataset')
+            st.write(df.head())
+
+            size = data_set.getvalue()
+            df_size = len(size)
+            (n_rows, n_coloumn, n_class) = data_shape(df)
+            (df, std, mean) = pre_proses_data(df)
+            submit = st.sidebar.button("submit")
+            if submit == True:
+                st.write("Data Set After preprossing ")
+                st.write(df.head())
+                same_id = sim_id(n_rows, n_coloumn, n_class,
+                                 df_size, std, mean)
+                for i in same_id:
+                    data_ref = pd.read_csv(str(i)+'.csv', header=None)
+                    data_ref = data_ref.iloc[1:11, :]
+                    models = data_ref.to_numpy()
+                    selected_var.append(best_data(models, df))
+                selected_var = two_arr(selected_var)
+                df = pd.DataFrame(selected_var, columns=['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
+                                                         'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel', "train_accuracy", "train_f1", "test_accuracy", "test_f1", "duration"])
+                st.dataframe(df)
+                df = df.drop_duplicates(['model'])
+
+                plost.bar_chart(
+                    data=df,
+                    bar='model',
+                    value=('test_accuracy'),
+                    group='value',
+                    color='model',
+                    direction='horizontal'
+                )
+                plost.pie_chart(
+                    data=df,
+                    theta='duration',
+                    color='model')
+
+                best_one = selected_var[1]
+                (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
+                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = best_one
+                data = dict(zip(names, best_one))
+                for x, y in data.items():
+                    if y != '0' and y != '0.0':
+                        temp[x] = y
                 st.table(temp)
                 boot_body(model, train_accuracy, test_accuracy,
                           train_f1, test_f1, duration)
@@ -318,5 +386,6 @@ if __name__ == "__main__":
                 ) = split_data(df, split_size)
                 uplouded_data_body(X_train, X_test, Y_train,
                                    Y_test, model, model_type, df)
+
         else:
             st.info('Awaiting for CSV file to be uploaded.')

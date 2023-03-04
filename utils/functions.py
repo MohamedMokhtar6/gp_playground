@@ -358,7 +358,7 @@ def sim_id(n_rows, n_coloumn, n_class, df_size, std, mean):
     dataf = pd.read_csv('datasets.csv', header=None)
     datasets = dataf.to_numpy()
     max_id = []
-    max_score = [0,]
+    max_score = [0, ]
     n = -1
     max_id2 = []
     for dataset in datasets:
@@ -467,4 +467,13 @@ def best_data(models, new_data):
                  max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, np.round(duration, 3)]
             a.append(b)
     a = sorted(a, key=lambda x: x[16], reverse=True)
-    return a[0]
+    return a
+
+
+def two_arr(arr):
+    a1 = []
+    for i in arr:
+        for j in arr[arr.index(i)]:
+            a1.append(j)
+    a1 = sorted(a1, key=lambda x: x[16], reverse=True)
+    return a1
