@@ -4,6 +4,7 @@ import time
 import streamlit as st
 import pandas as pd
 import numpy as np
+import csv
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.datasets import make_moons, make_circles, make_blobs
 from sklearn.preprocessing import StandardScaler
@@ -477,3 +478,118 @@ def two_arr(arr):
             a1.append(j)
     a1 = sorted(a1, key=lambda x: x[16], reverse=True)
     return a1
+
+
+def k_nearst(df):
+    metrics = ["minkowski", "euclidean", "manhattan", "chebyshev"]
+    for niebour in range(5, 21):
+        for metric in metrics:
+            model = knn_param_selector(niebour, metric)
+            (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+            (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+                model, X_train, Y_train, X_test, Y_test)
+            write_file("test.csv", 'K Nearest Neighbors', 0, 0, 0, 0, 0, 0, niebour, metric, 0, 0, 0, 0, 0, train_accuracy, train_f1,
+                       test_accuracy, test_f1, np.round((duration), 5))
+
+
+def SVC(df):
+    kernel = ["rbf",  "poly", "sigmoid", "linear"]
+    for C in np.arange(0.1, 2.0, 0.1):
+        for metric in kernel:
+            model = svc_param_selector(C, metric)
+            (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+            (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+                model, X_train, Y_train, X_test, Y_test)
+            write_file('test.csv', 'SVC', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, np.round(C, 5), 0, metric, train_accuracy, train_f1, test_accuracy,
+                       test_f1, np.round((duration), 5))
+
+
+def NaiveBayes(df):
+    model = nb_param_selector()
+    (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+    (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+        model, X_train, Y_train, X_test, Y_test)
+    write_file('test.csv', 'NaiveBayes', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, train_accuracy, train_f1, test_accuracy,
+               test_f1, np.round((duration), 5))
+
+
+def Decision_Tree(df):
+    criterion = ["gini", "entropy"]
+    max_features = [None, "auto", "sqrt", "log2"]
+    for max_depth in range(1, 51):
+        for metric in criterion:
+            for min_samples_split in range(1, 21):
+                for feature in max_features:
+
+                    model = dt_param_selector(
+                        metric, max_depth, min_samples_split, feature)
+                    (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+                    (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+                        model, X_train, Y_train, X_test, Y_test)
+                    if feature == None:
+                        write_file('test.csv', 'Decision Tree', metric, max_depth, min_samples_split, np.nan, 0, 0, 0, 0, 0, 0, 0, 0, 0, train_accuracy,
+                                   train_f1, test_accuracy, test_f1, np.round((duration), 5))
+                    else:
+                        write_file('test.csv', 'Decision Tree', metric, max_depth, min_samples_split, feature, 0, 0, 0, 0, 0, 0, 0, 0, 0, train_accuracy,
+                                   train_f1, test_accuracy, test_f1, np.round((duration), 5))
+
+
+def RandomForest(df):
+    criterion = ["gini", "entropy"]
+    max_features = ["sqrt", "log2"]
+    for metric in criterion:
+        for n_estimators in range(50, 310, 20):
+            for max_depth in range(1, 26, 1):
+                for min_samples_split in range(1, 21, 2):
+                    for feature in max_features:
+                        model = rf_param_selector(
+                            metric, n_estimators, max_depth, min_samples_split, feature)
+                        (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+                        (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+                            model, X_train, Y_train, X_test, Y_test)
+                        write_file('test.csv', 'Random Forest ', metric, max_depth, min_samples_split, feature, 0, n_estimators, 0, 0, 0, 0, 0, 0, 0, train_accuracy,
+                                   train_f1, test_accuracy, test_f1, np.round((duration), 5))
+
+
+def Gradient_Boosting(df):
+    for learning_rate in np.arange(0.1, 0.4, 0.1):
+        for n_estimators in range(10, 510, 20):
+            for max_depth in range(3, 31, 2):
+                model = gb_param_selector(
+                    learning_rate, n_estimators, max_depth)
+                (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+                (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+                    model, X_train, Y_train, X_test, Y_test)
+                write_file('test.csv', 'Gradient Boosting', 0, max_depth, 0, 0, np.round(learning_rate, 5), n_estimators, 0, 0, 0, 0, 0, 0, 0,  train_accuracy,
+                           train_f1, test_accuracy, test_f1, np.round((duration), 5))
+
+
+def LogisticRegression(df):
+    solvers = ["lbfgs", "newton-cg", "liblinear", "sag", "saga"]
+    for solver in solvers:
+        if solver in ["newton-cg", "lbfgs", "sag"]:
+            penalties = ["l2", "none"]
+        elif solver == "saga":
+            penalties = ["l1", "l2", "none"]
+        elif solver == "liblinear":
+            penalties = ["l1"]
+        for p in penalties:
+            for C in np.arange(0.1, 2.0, 0.1):
+                for max_iter in range(100, 2050, 50):
+                    model = lr_param_selector(solver, p, C, max_iter)
+                    (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
+                    (model, train_accuracy, train_f1, test_accuracy, test_f1, duration) = train_model(
+                        model, X_train, Y_train, X_test, Y_test)
+                    write_file('test.csv', 'Logistic Regression', 0, 0, 0, 0, 0, 0, 0, 0, solver, p, np.round(C, 5), max_iter, 0, train_accuracy,
+                               train_f1, test_accuracy, test_f1, np.round((duration), 5))
+
+
+def write_file(path, *args):
+    with open(path, "a") as file:
+        writer = csv.writer(file)
+        writer.writerow([*args])
+    file.close()
+
+
+def convert_df(df):
+    return df.to_csv().encode('utf-8')

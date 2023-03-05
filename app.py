@@ -215,7 +215,7 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
 
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
-        "choise your Data", ('Make your Data', 'Upload your CSV file', 'slim_Bot', 'Bruteforce_Bot'))
+        "choise your Data", ('Make your Data', 'Upload your CSV file', 'slim Bot', 'Brute force Bot'))
     if choise_data == 'Make your Data':
         (
             dataset,
@@ -242,7 +242,7 @@ if __name__ == "__main__":
             train_noise,
             test_noise,
         )
-    elif choise_data == 'slim_Bot':
+    elif choise_data == 'slim Bot':
         data_set = upload_data()
         if data_set is not None:
             selected_var = []
@@ -300,61 +300,41 @@ if __name__ == "__main__":
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')
-    elif choise_data == 'Bruteforce_Bot':
+    elif choise_data == 'Brute force Bot':
         data_set = upload_data()
         if data_set is not None:
-            selected_var = []
-            temp = {}
-            names = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
-                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
+
             df = pd.read_csv(data_set)
+            df1 = pd.read_csv('test.csv')
+            df1.drop(df1.index, inplace=True)
+            df1.to_csv('test.csv', index=False)
+
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
-
-            size = data_set.getvalue()
-            df_size = len(size)
-            (n_rows, n_coloumn, n_class) = data_shape(df)
             (df, std, mean) = pre_proses_data(df)
             submit = st.sidebar.button("submit")
             if submit == True:
                 st.write("Data Set After preprossing ")
                 st.write(df.head())
-                same_id = sim_id(n_rows, n_coloumn, n_class,
-                                 df_size, std, mean)
-                for i in same_id:
-                    data_ref = pd.read_csv(str(i)+'.csv', header=None)
-                    data_ref = data_ref.iloc[1:11, :]
-                    models = data_ref.to_numpy()
-                    selected_var.append(best_data(models, df))
-                selected_var = two_arr(selected_var)
-                df = pd.DataFrame(selected_var, columns=['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
-                                                         'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel', "train_accuracy", "train_f1", "test_accuracy", "test_f1", "duration"])
+                # NaiveBayes(df)
+                # k_nearst(df)
+                # SVC(df)
+                # Decision_Tree(df)
+                # RandomForest(df)
+                # LogisticRegression(df)
+                # Gradient_Boosting(df)
+                df = pd.read_csv('test.csv')
+                df = df.dropna()
+                df = df.sort_values(["test_accuracy"], axis=0, ascending=False)
                 st.dataframe(df)
-                df = df.drop_duplicates(['model'])
 
-                plost.bar_chart(
-                    data=df,
-                    bar='model',
-                    value=('test_accuracy'),
-                    group='value',
-                    color='model',
-                    direction='horizontal'
+                csv = convert_df(df)
+                st.download_button(
+                    label="Download data as CSV",
+                    data=csv,
+                    file_name='BruteForceBot.csv',
+                    mime='text/csv',
                 )
-                plost.pie_chart(
-                    data=df,
-                    theta='duration',
-                    color='model')
-
-                best_one = selected_var[1]
-                (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
-                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = best_one
-                data = dict(zip(names, best_one))
-                for x, y in data.items():
-                    if y != '0' and y != '0.0':
-                        temp[x] = y
-                st.table(temp)
-                boot_body(model, train_accuracy, test_accuracy,
-                          train_f1, test_f1, duration)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')
