@@ -176,43 +176,6 @@ def uplouded_data_body(
     tips_placeholder.info(model_tips)
 
 
-def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, duration):
-    col1, col2, col3 = st.columns((1, 1, 2))
-    with col1:
-        plot_placeholder = st.empty()
-        st.write('train_accuracy')
-        train_placeholder = st.empty()
-        st.write('test_accuracy')
-        test_placeholder = st.empty()
-
-    with col2:
-        st.write('train_f1')
-        train_f1_placeholder = st.empty()
-        st.write('test_f1')
-        test_f1_placeholder = st.empty()
-    with col3:
-        duration_placeholder = st.empty()
-        model_url_placeholder = st.empty()
-        snippet_placeholder = st.empty()
-        tips_header_placeholder = st.empty()
-        tips_placeholder = st.empty()
-
-    if model_type == 'Random Forest ':
-        model_type = 'Random Forest'
-    model_url = get_model_url(model_type)
-    train_placeholder.info(train_accuracy)
-    test_placeholder.info(test_accuracy)
-    train_f1_placeholder.info(train_f1)
-    test_f1_placeholder.info(test_f1)
-    model_tips = get_model_tips(model_type)
-
-    duration_placeholder.warning(f"Training took {duration:.3f} seconds")
-    model_url_placeholder.markdown(model_url)
-    # snippet_placeholder.code(snippet)
-    tips_header_placeholder.header(f"**Tips on the {model_type} 💡 **")
-    tips_placeholder.info(model_tips)
-
-
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
         "choise your Data", ('Make your Data', 'Upload your CSV file', 'slim Bot', 'Brute force Bot'))
@@ -246,9 +209,6 @@ if __name__ == "__main__":
         data_set = upload_data()
         if data_set is not None:
             selected_var = []
-            temp = {}
-            names = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
-                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
             df = pd.read_csv(data_set)
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
@@ -286,29 +246,15 @@ if __name__ == "__main__":
                     data=df,
                     theta='duration',
                     color='model')
-
-                best_one = selected_var[1]
-                (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
-                 metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = best_one
-                data = dict(zip(names, best_one))
-                for x, y in data.items():
-                    if y != '0' and y != '0.0':
-                        temp[x] = y
-                st.table(temp)
-                boot_body(model, train_accuracy, test_accuracy,
-                          train_f1, test_f1, duration)
+                display_best_model(df)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')
     elif choise_data == 'Brute force Bot':
         data_set = upload_data()
         if data_set is not None:
-
             df = pd.read_csv(data_set)
-            df1 = pd.read_csv('test.csv')
-            df1.drop(df1.index, inplace=True)
-            df1.to_csv('test.csv', index=False)
-
+            # empty_datafreame('test.csv')
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
             (df, std, mean) = pre_proses_data(df)
@@ -316,18 +262,11 @@ if __name__ == "__main__":
             if submit == True:
                 st.write("Data Set After preprossing ")
                 st.write(df.head())
-                # NaiveBayes(df)
-                # k_nearst(df)
-                # SVC(df)
-                # Decision_Tree(df)
-                # RandomForest(df)
-                # LogisticRegression(df)
-                # Gradient_Boosting(df)
+                # run_all_model(df)
                 df = pd.read_csv('test.csv')
                 df = df.dropna()
                 df = df.sort_values(["test_accuracy"], axis=0, ascending=False)
                 st.dataframe(df)
-
                 csv = convert_df(df)
                 st.download_button(
                     label="Download data as CSV",
@@ -335,6 +274,7 @@ if __name__ == "__main__":
                     file_name='BruteForceBot.csv',
                     mime='text/csv',
                 )
+                display_best_model(df)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')

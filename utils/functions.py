@@ -593,3 +593,70 @@ def write_file(path, *args):
 
 def convert_df(df):
     return df.to_csv().encode('utf-8')
+
+
+def display_best_model(df):
+    temp = {}
+    names = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
+                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
+    best_one = df.iloc[0]
+    (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
+     metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = best_one
+    data = dict(zip(names, best_one))
+    for x, y in data.items():
+        if y != '0' and y != '0.0' and y != 0:
+            temp[x] = y
+    st.table(temp)
+    boot_body(model, train_accuracy, test_accuracy,
+              train_f1, test_f1, duration)
+
+
+def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, duration):
+    col1, col2, col3 = st.columns((1, 1, 2))
+    with col1:
+        plot_placeholder = st.empty()
+        st.write('train_accuracy')
+        train_placeholder = st.empty()
+        st.write('test_accuracy')
+        test_placeholder = st.empty()
+
+    with col2:
+        st.write('train_f1')
+        train_f1_placeholder = st.empty()
+        st.write('test_f1')
+        test_f1_placeholder = st.empty()
+    with col3:
+        duration_placeholder = st.empty()
+        model_url_placeholder = st.empty()
+        snippet_placeholder = st.empty()
+        tips_header_placeholder = st.empty()
+        tips_placeholder = st.empty()
+
+    if model_type == 'Random Forest ':
+        model_type = 'Random Forest'
+    model_url = get_model_url(model_type)
+    train_placeholder.info(train_accuracy)
+    test_placeholder.info(test_accuracy)
+    train_f1_placeholder.info(train_f1)
+    test_f1_placeholder.info(test_f1)
+    model_tips = get_model_tips(model_type)
+
+    duration_placeholder.warning(f"Training took {duration:.3f} seconds")
+    model_url_placeholder.markdown(model_url)
+    # snippet_placeholder.code(snippet)
+    tips_header_placeholder.header(f"**Tips on the {model_type} 💡 **")
+    tips_placeholder.info(model_tips)
+
+def run_all_model(df):
+    NaiveBayes(df)
+    k_nearst(df)
+    SVC(df)
+    Decision_Tree(df)
+    RandomForest(df)
+    LogisticRegression(df)
+    Gradient_Boosting(df)
+
+def empty_datafreame(data_name):
+    df1 = pd.read_csv(data_name)
+    df1.drop(df1.index, inplace=True)
+    df1.to_csv(data_name, index=False)
