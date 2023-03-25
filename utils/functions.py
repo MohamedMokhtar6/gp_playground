@@ -518,7 +518,7 @@ def Decision_Tree(df):
     max_features = [None, "auto", "sqrt", "log2"]
     for max_depth in range(1, 51):
         for metric in criterion:
-            for min_samples_split in range(1, 21):
+            for min_samples_split in range(2, 21):
                 for feature in max_features:
 
                     model = dt_param_selector(
@@ -540,7 +540,7 @@ def RandomForest(df):
     for metric in criterion:
         for n_estimators in range(50, 310, 20):
             for max_depth in range(1, 26, 1):
-                for min_samples_split in range(1, 21, 2):
+                for min_samples_split in range(2, 21, 2):
                     for feature in max_features:
                         model = rf_param_selector(
                             metric, n_estimators, max_depth, min_samples_split, feature)
@@ -598,7 +598,7 @@ def convert_df(df):
 def display_best_model(df):
     temp = {}
     names = ['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
-                     'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
+             'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel']
     best_one = df.iloc[0]
     (model, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors,
      metric, solver, penalty, C, max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration) = best_one
@@ -647,6 +647,7 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
     tips_header_placeholder.header(f"**Tips on the {model_type} 💡 **")
     tips_placeholder.info(model_tips)
 
+
 def run_all_model(df):
     NaiveBayes(df)
     k_nearst(df)
@@ -655,6 +656,7 @@ def run_all_model(df):
     RandomForest(df)
     LogisticRegression(df)
     Gradient_Boosting(df)
+
 
 def empty_datafreame(data_name):
     df1 = pd.read_csv(data_name)
