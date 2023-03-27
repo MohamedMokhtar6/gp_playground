@@ -515,7 +515,7 @@ def NaiveBayes(df):
 
 def Decision_Tree(df):
     criterion = ["gini", "entropy"]
-    max_features = [None, "auto", "sqrt", "log2"]
+    max_features = [None,  "sqrt", "log2"]
     for max_depth in range(1, 51):
         for metric in criterion:
             for min_samples_split in range(2, 21):
@@ -568,9 +568,9 @@ def LogisticRegression(df):
     solvers = ["lbfgs", "newton-cg", "liblinear", "sag", "saga"]
     for solver in solvers:
         if solver in ["newton-cg", "lbfgs", "sag"]:
-            penalties = ["l2", "none"]
+            penalties = ["l2"]
         elif solver == "saga":
-            penalties = ["l1", "l2", "none"]
+            penalties = ["l1", "l2"]
         elif solver == "liblinear":
             penalties = ["l1"]
         for p in penalties:
