@@ -1,8 +1,10 @@
 import numpy as np
 import streamlit as st
-import pandas as pd
 from sklearn.datasets import load_diabetes
 import plost
+import matplotlib.pyplot as plt
+import pandas as pd
+
 
 from utils.functions import *
 
@@ -178,7 +180,7 @@ def uplouded_data_body(
 
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
-        "choise your Data", ('Make your Data', 'Upload your CSV file', 'slim Bot', 'Brute force Bot'))
+        "choise your Data", ('Make your Data', 'Upload your CSV file', 'The LittleGenius', 'BrainForce'))
     if choise_data == 'Make your Data':
         (
             dataset,
@@ -205,7 +207,7 @@ if __name__ == "__main__":
             train_noise,
             test_noise,
         )
-    elif choise_data == 'slim Bot':
+    elif choise_data == 'The LittleGenius':
         data_set = upload_data()
         if data_set is not None:
             selected_var = []
@@ -247,11 +249,16 @@ if __name__ == "__main__":
                     data=df,
                     theta='duration',
                     color='model')
-                display_best_model(df)
+                model = display_best_model(df)
+
+                snippet = generate_data_snippet(
+                    model, model, df
+                )
+                st.code(snippet)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')
-    elif choise_data == 'Brute force Bot':
+    elif choise_data == 'BrainForce':
         data_set = upload_data()
         if data_set is not None:
             df = pd.read_csv(data_set)
@@ -275,7 +282,13 @@ if __name__ == "__main__":
                     file_name='BruteForceBot.csv',
                     mime='text/csv',
                 )
-                display_best_model(df)
+                model = display_best_model(df)
+                if model == 'Random Forest':
+                    model = 'RandomForest'
+                snippet = generate_data_snippet(
+                    model, model, df
+                )
+                st.code(snippet)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')
@@ -305,6 +318,7 @@ if __name__ == "__main__":
                 (
                     X_train, X_test, Y_train, Y_test
                 ) = split_data(df, split_size)
+
                 uplouded_data_body(X_train, X_test, Y_train,
                                    Y_test, model, model_type, df)
 

@@ -174,23 +174,67 @@ def generate_data_snippet(
     model_import = model_imports[model_type]
 
     snippet = f"""
-    >>> 
     >>> {model_import}
     >>> import pandas as pd
     >>> import numpy as np
     >>> from sklearn.tree import {model_type}
     >>> from sklearn.metrics import accuracy_score, f1_score
-    >>>
     >>> df = pd.read_csv(Data Frame Path)
-    >>>
-    >>> X = df.iloc[:, :-1]
-    >>> Y = df.iloc[:, -1]
-    >>> X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=(100-split_size)/100)
-    >>>
+    >>>def encodeing_df(df):
+        >>>col_name = []
+        >>>label_encoder = LabelEncoder()
+        >>>for (colname, colval) in df.iteritems():
+        >>>    if colval.dtype == 'object':
+        >>>        col_name.append(colname)
+        >>>for col in col_name:
+        >>>    df[col] = label_encoder.fit_transform(df[col])
+        >>>return df
+    >>>def replace_null(df):
+        >>>col_nan = []
+        >>>for (colname, colval) in df.iteritems():
+        >>>    if df[colname].isnull().values.any() == True:
+        >>>        col_nan.append(colname)
+        >>>for col in col_nan:
+        >>>    mean_value = df[col].mean()
+        >>>    df[col].fillna(value=mean_value, inplace=True)
+        >>>return df
+    >>>def scaling(df):
+        >>>x = df.iloc[:, :-1]  # Using all column except for the last column as X
+        >>>y = df.iloc[:, -1]  # Selecting the last
+        >>>m = x.max() - x.min()
+        >>>m = m.to_dict()
+        >>>l = []
+        >>>for key, val in m.items():
+        >>>    if val == 0:
+        >>>        l.append(key)
+        >>>for i in l:
+        >>>    x = x.drop([i], axis=1)
+        >>>df_norm = (x-x.min())/(x.max()-x.min())
+        >>>df_norm = pd.concat((df_norm, y), 1)
+        >>>return df_norm
+    >>>def cal_mean(df):
+        >>>df_mean = df.mean(axis=0).mean(axis=0)
+        >>>return df_mean
+    >>>def cal_std(df):
+        >>>col_std = df.std()
+        >>>col = col_std.mean(axis=0)
+        >>>return col
+    >>>def pre_proses_data(df):
+        >>>df = encodeing_df(df)
+        >>>df = replace_null(df)
+        >>>std = cal_std(df)
+        >>>std = np.round(std, 5)
+        >>>mean = cal_mean(df)
+        >>>mean = np.round(mean, 5)
+        >>>df = scaling(df)
+        >>>return df
+    >>>df=pre_proses_data(df)
+    >>>>>> X = df.iloc[:, :-1]
+    >>>>>> Y = df.iloc[:, -1]
+    >>>>>> X_train, X_test, Y_train, Y_test = train_test_split(
+    >>>    X, Y, test_size=(100-split_size)/100)
     >>> model = {model_text_rep}
     >>> model.fit(x_train, y_train)
-
     >>> y_train_pred = model.predict(x_train)
     >>> y_test_pred = model.predict(x_test)
     >>> train_accuracy = accuracy_score(y_train, y_train_pred)

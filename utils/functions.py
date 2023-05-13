@@ -172,6 +172,7 @@ def plot_decision_boundary_and_metrics(
 
 def train_model(model, x_train, y_train, x_test, y_test):
     t0 = time.time()
+
     model.fit(x_train, y_train)
     duration = time.time() - t0
     y_train_pred = model.predict(x_train)
@@ -607,8 +608,9 @@ def display_best_model(df):
         if y != '0' and y != '0.0' and y != 0:
             temp[x] = y
     st.table(temp)
-    boot_body(model, train_accuracy, test_accuracy,
-              train_f1, test_f1, duration)
+    boot_body(model, np.round(train_accuracy*100, 2), np.round(test_accuracy*100, 2),
+              np.round(train_f1*100, 2), np.round(test_f1*100, 2), duration)
+    return model
 
 
 def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, duration):
@@ -641,7 +643,8 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
     test_f1_placeholder.info(test_f1)
     model_tips = get_model_tips(model_type)
 
-    duration_placeholder.warning(f"Training took {duration:.3f} seconds")
+    duration_placeholder.warning(
+        f"Training took {float (duration):.3f} seconds")
     model_url_placeholder.markdown(model_url)
     # snippet_placeholder.code(snippet)
     tips_header_placeholder.header(f"**Tips on the {model_type} 💡 **")
