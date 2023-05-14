@@ -20,6 +20,8 @@ from models_2.LogisticRegression import lr_param_selector
 from models_2.KNearesNeighbors import knn_param_selector
 from models_2.SVC import svc_param_selector
 from models_2.GradientBoosting import gb_param_selector
+from multiprocessing import Process
+
 
 
 def local_css(file_name):
@@ -652,13 +654,35 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
 
 
 def run_all_model(df):
-    NaiveBayes(df)
-    k_nearst(df)
-    SVC(df)
-    Decision_Tree(df)
-    RandomForest(df)
-    LogisticRegression(df)
-    Gradient_Boosting(df)
+    p1 = Process(target=NaiveBayes(df))
+    p2 = Process(target=k_nearst(df))
+    p3= Process(target=SVC(df))
+    p4 = Process(target=Decision_Tree(df))
+    p5 = Process(target=RandomForest(df))
+    p6 = Process(target=Gradient_Boosting(df))
+    p7 = Process(target=LogisticRegression(df))
+    p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p5.start()
+    p6.start()
+    p7.join()
+    p1.join()
+    p2.join()
+    p3.join()
+    p4.join()
+    p5.join()
+    p6.start()
+    p7.join()
+
+    
+    
+    
+    
+    
+    
+    
 
 
 def empty_datafreame(data_name):

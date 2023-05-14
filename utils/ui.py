@@ -171,7 +171,11 @@ def generate_data_snippet(
 ):
 
     model_text_rep = repr(model)
-    model_import = model_imports[model_type]
+    if model_type =='Random Forest ':
+        model_import = model_imports["Random Forest"]
+    else:   
+        model_import = model_imports[model_type]
+        
 
     snippet = f"""
     >>> {model_import}

@@ -250,9 +250,9 @@ if __name__ == "__main__":
                     theta='duration',
                     color='model')
                 model = display_best_model(df)
-
+                model_type=model
                 snippet = generate_data_snippet(
-                    model, model, df
+                    model, model_type, df
                 )
                 st.code(snippet)
 
@@ -262,7 +262,7 @@ if __name__ == "__main__":
         data_set = upload_data()
         if data_set is not None:
             df = pd.read_csv(data_set)
-            # empty_datafreame('test.csv')
+            empty_datafreame('test.csv')
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
             (df, std, mean) = pre_proses_data(df)
@@ -270,7 +270,7 @@ if __name__ == "__main__":
             if submit == True:
                 st.write("Data Set After preprossing ")
                 st.write(df.head())
-                # run_all_model(df)
+                run_all_model(df)
                 df = pd.read_csv('test.csv')
                 df = df.dropna()
                 df = df.sort_values(["test_accuracy"], axis=0, ascending=False)
@@ -283,8 +283,6 @@ if __name__ == "__main__":
                     mime='text/csv',
                 )
                 model = display_best_model(df)
-                if model == 'Random Forest':
-                    model = 'RandomForest'
                 snippet = generate_data_snippet(
                     model, model, df
                 )
