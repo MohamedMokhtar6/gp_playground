@@ -406,6 +406,8 @@ def best_data(models, new_data):
         (model_name, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors, metric, solver, penalty, C,
          max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration, data_id, n_class, n_rows, n_coloumn, data_size, mean, std) = model
         if model_name == 'Random Forest ' or model_name == 'Random Forest':
+            if min_samples_split ==1:
+                min_samples_split=2
             model = rf_param_selector(
                 criterion, int(n_estimators), int(max_depth), int(min_samples_split), max_features)
             (X_train, X_test, Y_train, Y_test) = split_data(new_data, 80)
@@ -418,6 +420,8 @@ def best_data(models, new_data):
         elif model_name == 'Decision Tree':
             if max_features != 'sqrt' or max_features != 'log2':
                 max_features = None
+            if min_samples_split ==1:
+                min_samples_split=2
             model = dt_param_selector(criterion, int(
                 max_depth), int(min_samples_split), max_features)
             (X_train, X_test, Y_train, Y_test) = split_data(new_data, 80)
