@@ -25,6 +25,7 @@ st.set_page_config(
 
 def sidebar_upload_controllers():
     data_set = upload_data()
+    
     model_type, model = model_selector()
     return (
         data_set,
@@ -93,10 +94,7 @@ def body(
         "test_accuracy": test_accuracy,
         "test_f1": test_f1,
     }
-    # snippet_par = {
-    #     "model": model, "model_type": model_type, 'n_samples': n_samples , 'train_noise': train_noise, 'test_noise': test_noise,
-    #     'dataset': dataset, "degree": degree
-    # }
+ 
 
     snippet = generate_snippet(
         model, model_type, n_samples, train_noise, test_noise, dataset, degree
@@ -118,7 +116,7 @@ def body(
 
 
 def uplouded_data_body(
-    x_train, x_test, y_train, y_test, model, model_type, dataset
+    x_train, x_test, y_train, y_test, model, model_type, dataset,Pre_Selector,encodeing,replaceNull,scale
 ):
     st.markdown('** Data splits**')
     col1, col2, col3 = st.columns((1, 1, 2))
@@ -131,6 +129,8 @@ def uplouded_data_body(
         train_placeholder = st.empty()
         st.write('test_accuracy')
         test_placeholder = st.empty()
+        st.write('Model Parameters')
+        prams = st.empty()
 
     with col2:
         st.write('Test set')
@@ -139,6 +139,7 @@ def uplouded_data_body(
         train_f1_placeholder = st.empty()
         st.write('test_f1')
         test_f1_placeholder = st.empty()
+       
     with col3:
         duration_placeholder = st.empty()
         model_url_placeholder = st.empty()
@@ -156,15 +157,15 @@ def uplouded_data_body(
         duration,
     ) = train_model(model, x_train, y_train, x_test, y_test)
     snippet = generate_data_snippet(
-        model, model_type, dataset
+        model, model_type, dataset,Pre_Selector,encodeing,replaceNull,scale
     )
     train_placeholder.info(train_accuracy)
     test_placeholder.info(test_accuracy)
     train_f1_placeholder.info(train_f1)
     test_f1_placeholder.info(test_f1)
 
-    st.write('Model Parameters')
-    st.write(model.get_params())
+    
+    prams.write(model.get_params())
 
     model_tips = get_model_tips(model_type)
 
@@ -181,6 +182,7 @@ def uplouded_data_body(
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
         "choise your Data", ('Make your Data', 'Upload your CSV file', 'The LittleGenius', 'BrainForce'))
+
     if choise_data == 'Make your Data':
         (
             dataset,
@@ -218,11 +220,10 @@ if __name__ == "__main__":
             size = data_set.getvalue()
             df_size = len(size)
             (n_rows, n_coloumn, n_class) = data_shape(df)
-            (df, std, mean) = pre_proses_data(df)
+            (df, std, mean,Pre_Selector,encodeing,replaceNull,scale) = pre_Selector(df)
             submit = st.sidebar.button("submit")
             if submit == True:
-                st.write("Data Set After preprossing ")
-                st.write(df.head())
+                
                 same_id = sim_id(n_rows, n_coloumn, n_class,
                                  df_size, std, mean)
                 for i in same_id:
@@ -234,8 +235,11 @@ if __name__ == "__main__":
                 selected_var = two_arr(selected_var)
                 df = pd.DataFrame(selected_var, columns=['model', 'criterion', 'max_depth', 'min_samples_split', 'max_features', 'learning_rate', 'n_estimators',
                                                          'n_neighbors', 'metric', 'solver', 'penalty', ' C', 'max_iter', 'kernel', "train_accuracy", "train_f1", "test_accuracy", "test_f1", "duration"])
-                st.dataframe(df)
+                
+                df2 =df.loc[df['train_accuracy'] > df['test_accuracy']]
+                st.dataframe(df2)
                 df = df.drop_duplicates(['model'])
+                
 
                 plost.bar_chart(
                     data=df,
@@ -249,10 +253,10 @@ if __name__ == "__main__":
                     data=df,
                     theta='duration',
                     color='model')
-                model = display_best_model(df)
+                model = display_best_model(df2)
                 model_type=model
                 snippet = generate_data_snippet(
-                    model, model_type, df
+                    model, model_type, df,Pre_Selector,encodeing,replaceNull,scale
                 )
                 st.code(snippet)
 
@@ -262,17 +266,16 @@ if __name__ == "__main__":
         data_set = upload_data()
         if data_set is not None:
             df = pd.read_csv(data_set)
-            empty_datafreame('test.csv')
+            # empty_datafreame('test.csv')
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
-            (df, std, mean) = pre_proses_data(df)
+            (df, std, mean,Pre_Selector,encodeing,replaceNull,scale) = pre_Selector(df)
             submit = st.sidebar.button("submit")
             if submit == True:
-                st.write("Data Set After preprossing ")
-                st.write(df.head())
-                run_all_model(df)
+                # run_all_model(df)
                 df = pd.read_csv('test.csv')
                 df = df.dropna()
+                df =df.loc[df['train_accuracy'] > df['test_accuracy']]
                 df = df.sort_values(["test_accuracy"], axis=0, ascending=False)
                 st.dataframe(df)
                 csv = convert_df(df)
@@ -284,13 +287,14 @@ if __name__ == "__main__":
                 )
                 model = display_best_model(df)
                 snippet = generate_data_snippet(
-                    model, model, df
+                    model, model, df,Pre_Selector,encodeing,replaceNull,scale
                 )
                 st.code(snippet)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')
     else:
+       
         (
             data_set,
             model_type,
@@ -299,14 +303,12 @@ if __name__ == "__main__":
         ) = sidebar_upload_controllers()
 
         if data_set is not None:
+            
             df = pd.read_csv(data_set)
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
-            df = encodeing_df(df)
-            df = replace_null(df)
-            df = scaling(df)
-            st.write("Data Set After preprossing ")
-            st.write(df.head())
+
+            (df, std, mean,Pre_Selector,encodeing,replaceNull,scale)=pre_Selector(df)
             with st.sidebar.header('2. Set Parameters'):
                 split_size = st.sidebar.slider(
                     'Data split ratio (% for Training Set)', 10, 90, 80, 5)
@@ -318,7 +320,7 @@ if __name__ == "__main__":
                 ) = split_data(df, split_size)
 
                 uplouded_data_body(X_train, X_test, Y_train,
-                                   Y_test, model, model_type, df)
+                                   Y_test, model, model_type, df,Pre_Selector,encodeing,replaceNull,scale)
 
         else:
             st.info('Awaiting for CSV file to be uploaded.')

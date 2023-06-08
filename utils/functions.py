@@ -21,15 +21,10 @@ from models_2.KNearesNeighbors import knn_param_selector
 from models_2.SVC import svc_param_selector
 from models_2.GradientBoosting import gb_param_selector
 from multiprocessing import Process
-
-
-
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-@st.cache(suppress_st_warning=True, allow_output_mutation=True, show_spinner=True)
+# @st.cache(suppress_st_warning=True, allow_output_mutation=True, show_spinner=True)
 def generate_data(dataset, n_samples, train_noise, test_noise, n_classes):
     if dataset == "moons":
         x_train, y_train = make_moons(n_samples=n_samples, noise=train_noise)
@@ -59,7 +54,6 @@ def generate_data(dataset, n_samples, train_noise, test_noise, n_classes):
         x_test = scaler.transform(x_test)
 
     return x_train, y_train, x_test, y_test
-
 
 def plot_decision_boundary_and_metrics(
     model, x_train, y_train, x_test, y_test, metrics
@@ -171,7 +165,6 @@ def plot_decision_boundary_and_metrics(
 
     return fig
 
-
 def train_model(model, x_train, y_train, x_test, y_test):
     t0 = time.time()
 
@@ -188,23 +181,19 @@ def train_model(model, x_train, y_train, x_test, y_test):
 
     return model, train_accuracy, train_f1, test_accuracy, test_f1, duration
 
-
 def img_to_bytes(img_path):
     img_bytes = Path(img_path).read_bytes()
     encoded = base64.b64encode(img_bytes).decode()
     return encoded
 
-
 def get_model_tips(model_type):
     model_tips = model_infos[model_type]
     return model_tips
-
 
 def get_model_url(model_type):
     model_url = model_urls[model_type]
     text = f"**Link to scikit-learn official documentation [here]({model_url}) 💻 **"
     return text
-
 
 def add_polynomial_features(x_train, x_test, degree):
     for d in range(2, degree + 1):
@@ -225,7 +214,6 @@ def add_polynomial_features(x_train, x_test, degree):
             axis=1,
         )
     return x_train, x_test
-
 
 def build_model(df, model):
     X = df.iloc[:, :-1]  # Using all column except for the last column as X
@@ -274,7 +262,6 @@ def build_model(df, model):
     st.write('Model Parameters')
     st.write(model.get_params())
 
-
 def split_data(df, split_size):
     X = df.iloc[:, :-1]  # Using all column except for the last column as X
     Y = df.iloc[:, -1]  # Selecting the last column as Y
@@ -284,17 +271,15 @@ def split_data(df, split_size):
 
     return X_train, X_test, Y_train, Y_test
 
-
 def encodeing_df(df):
     col_name = []
     label_encoder = LabelEncoder()
     for (colname, colval) in df.iteritems():
-        if colval.dtype == 'object':
+        if colval.dtype == 'object' or colval.dtype == 'bool':
             col_name.append(colname)
     for col in col_name:
         df[col] = label_encoder.fit_transform(df[col])
     return df
-
 
 def replace_null(df):
     col_nan = []
@@ -306,7 +291,6 @@ def replace_null(df):
         mean_value = df[col].mean()
         df[col].fillna(value=mean_value, inplace=True)
     return df
-
 
 def scaling(df):
     x = df.iloc[:, :-1]  # Using all column except for the last column as X
@@ -325,17 +309,14 @@ def scaling(df):
 
     return df_norm
 
-
 def cal_mean(df):
     df_mean = df.mean(axis=0).mean(axis=0)
     return df_mean
-
 
 def cal_std(df):
     col_std = df.std()
     col = col_std.mean(axis=0)
     return col
-
 
 def data_shape(df):
     # n_class	n_rows	n_coloumn	data_size
@@ -346,17 +327,12 @@ def data_shape(df):
     n_class = len(df[index_last_col].unique())
     return n_rows, n_coloumn, n_class
 
-
 def pre_proses_data(df):
     df = encodeing_df(df)
     df = replace_null(df)
-    std = cal_std(df)
-    std = np.round(std, 5)
-    mean = cal_mean(df)
-    mean = np.round(mean, 5)
-    df = scaling(df)
-    return df, std, mean
 
+    # df = scaling(df)
+    return df, std, mean
 
 def sim_id(n_rows, n_coloumn, n_class, df_size, std, mean):
     dataf = pd.read_csv('datasets.csv', header=None)
@@ -399,14 +375,13 @@ def sim_id(n_rows, n_coloumn, n_class, df_size, std, mean):
 
     return (max_id2)
 
-
 def best_data(models, new_data):
     a = []
     for model in models:
         (model_name, criterion, max_depth, min_samples_split, max_features, learning_rate, n_estimators, n_neighbors, metric, solver, penalty, C,
          max_iter, kernel, train_accuracy, train_f1, test_accuracy, test_f1, duration, data_id, n_class, n_rows, n_coloumn, data_size, mean, std) = model
         if model_name == 'Random Forest ' or model_name == 'Random Forest':
-            if min_samples_split =="1":
+            if min_samples_split=="1":
                 min_samples_split="2"
             model = rf_param_selector(
                 criterion, int(n_estimators), int(max_depth), int(min_samples_split), max_features)
@@ -420,8 +395,9 @@ def best_data(models, new_data):
         elif model_name == 'Decision Tree':
             if max_features != 'sqrt' or max_features != 'log2':
                 max_features = None
-            if min_samples_split =="1":
+            if min_samples_split=="1":
                 min_samples_split="2"
+         
             model = dt_param_selector(criterion, int(
                 max_depth), int(min_samples_split), max_features)
             (X_train, X_test, Y_train, Y_test) = split_data(new_data, 80)
@@ -477,7 +453,6 @@ def best_data(models, new_data):
     a = sorted(a, key=lambda x: x[16], reverse=True)
     return a
 
-
 def two_arr(arr):
     a1 = []
     for i in arr:
@@ -485,7 +460,6 @@ def two_arr(arr):
             a1.append(j)
     a1 = sorted(a1, key=lambda x: x[16], reverse=True)
     return a1
-
 
 def k_nearst(df):
     metrics = ["minkowski", "euclidean", "manhattan", "chebyshev"]
@@ -498,7 +472,6 @@ def k_nearst(df):
             write_file("test.csv", 'K Nearest Neighbors', 0, 0, 0, 0, 0, 0, niebour, metric, 0, 0, 0, 0, 0, train_accuracy, train_f1,
                        test_accuracy, test_f1, np.round((duration), 5))
 
-
 def SVC(df):
     kernel = ["rbf",  "poly", "sigmoid", "linear"]
     for C in np.arange(0.1, 2.0, 0.1):
@@ -510,7 +483,6 @@ def SVC(df):
             write_file('test.csv', 'SVC', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, np.round(C, 5), 0, metric, train_accuracy, train_f1, test_accuracy,
                        test_f1, np.round((duration), 5))
 
-
 def NaiveBayes(df):
     model = nb_param_selector()
     (X_train, X_test, Y_train, Y_test) = split_data(df, 80)
@@ -518,7 +490,6 @@ def NaiveBayes(df):
         model, X_train, Y_train, X_test, Y_test)
     write_file('test.csv', 'NaiveBayes', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, train_accuracy, train_f1, test_accuracy,
                test_f1, np.round((duration), 5))
-
 
 def Decision_Tree(df):
     criterion = ["gini", "entropy"]
@@ -540,7 +511,6 @@ def Decision_Tree(df):
                         write_file('test.csv', 'Decision Tree', metric, max_depth, min_samples_split, feature, 0, 0, 0, 0, 0, 0, 0, 0, 0, train_accuracy,
                                    train_f1, test_accuracy, test_f1, np.round((duration), 5))
 
-
 def RandomForest(df):
     criterion = ["gini", "entropy"]
     max_features = ["sqrt", "log2"]
@@ -557,7 +527,6 @@ def RandomForest(df):
                         write_file('test.csv', 'Random Forest ', metric, max_depth, min_samples_split, feature, 0, n_estimators, 0, 0, 0, 0, 0, 0, 0, train_accuracy,
                                    train_f1, test_accuracy, test_f1, np.round((duration), 5))
 
-
 def Gradient_Boosting(df):
     for learning_rate in np.arange(0.1, 0.4, 0.1):
         for n_estimators in range(10, 510, 20):
@@ -569,7 +538,6 @@ def Gradient_Boosting(df):
                     model, X_train, Y_train, X_test, Y_test)
                 write_file('test.csv', 'Gradient Boosting', 0, max_depth, 0, 0, np.round(learning_rate, 5), n_estimators, 0, 0, 0, 0, 0, 0, 0,  train_accuracy,
                            train_f1, test_accuracy, test_f1, np.round((duration), 5))
-
 
 def LogisticRegression(df):
     solvers = ["lbfgs", "newton-cg", "liblinear", "sag", "saga"]
@@ -590,17 +558,14 @@ def LogisticRegression(df):
                     write_file('test.csv', 'Logistic Regression', 0, 0, 0, 0, 0, 0, 0, 0, solver, p, np.round(C, 5), max_iter, 0, train_accuracy,
                                train_f1, test_accuracy, test_f1, np.round((duration), 5))
 
-
 def write_file(path, *args):
     with open(path, "a") as file:
         writer = csv.writer(file)
         writer.writerow([*args])
     file.close()
 
-
 def convert_df(df):
     return df.to_csv().encode('utf-8')
-
 
 def display_best_model(df):
     temp = {}
@@ -617,7 +582,6 @@ def display_best_model(df):
     boot_body(model, np.round(train_accuracy*100, 2), np.round(test_accuracy*100, 2),
               np.round(train_f1*100, 2), np.round(test_f1*100, 2), duration)
     return model
-
 
 def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, duration):
     col1, col2, col3 = st.columns((1, 1, 2))
@@ -656,7 +620,6 @@ def boot_body(model_type, train_accuracy, test_accuracy, train_f1, test_f1, dura
     tips_header_placeholder.header(f"**Tips on the {model_type} 💡 **")
     tips_placeholder.info(model_tips)
 
-
 def run_all_model(df):
     p1 = Process(target=NaiveBayes(df))
     p2 = Process(target=k_nearst(df))
@@ -680,16 +643,30 @@ def run_all_model(df):
     p6.start()
     p7.join()
 
-    
-    
-    
-    
-    
-    
-    
-
-
 def empty_datafreame(data_name):
     df1 = pd.read_csv(data_name)
     df1.drop(df1.index, inplace=True)
     df1.to_csv(data_name, index=False)
+
+def pre_Selector(df):
+    Pre_Selector = st.sidebar.radio("Do you want to Preprocess Your Dataset?", ['Yes', 'No'],index=1)
+    encodeing='NO'
+    replaceNull='NO'
+    scale='NO'
+    if Pre_Selector=="Yes":
+            encodeing = st.sidebar.radio("Do you want to Encodeing Your Dataset?", ['Yes', 'No'])
+            replaceNull = st.sidebar.radio("Do you want to replace Null for Your Dataset?", ['Yes', 'No'])
+            scale = st.sidebar.radio("Do you want to scaling Your Dataset?", ['Yes', 'No'],index=1)
+            if encodeing=="Yes":
+                df = encodeing_df(df)
+            if replaceNull=="Yes":
+                df = replace_null(df)
+            if scale=="Yes":
+                df = scaling(df)
+            st.write("Data Set After preprossing ")
+            st.write(df.head()) 
+    std = cal_std(df)
+    std = np.round(std, 5)
+    mean = cal_mean(df)
+    mean = np.round(mean, 5)
+    return df, std, mean,Pre_Selector,encodeing,replaceNull,scale

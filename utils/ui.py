@@ -167,24 +167,16 @@ def generate_snippet(
 
 
 def generate_data_snippet(
-        model, model_type, dataset
+        model, model_type,df, Pre_Selector,encodeing,replaceNull,scale
 ):
-
-    model_text_rep = repr(model)
-    if model_type =='Random Forest ':
-        model_import = model_imports["Random Forest"]
-    else:   
-        model_import = model_imports[model_type]
+    encod=''
+    replaceNan=''
+    scaleing=''
+    if Pre_Selector=="Yes":
         
-
-    snippet = f"""
-    >>> {model_import}
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> from sklearn.tree import {model_type}
-    >>> from sklearn.metrics import accuracy_score, f1_score
-    >>> df = pd.read_csv(Data Frame Path)
-    >>>def encodeing_df(df):
+        if encodeing=="Yes":
+            
+            encod=f""">>>def encodeing_df(df):
         >>>col_name = []
         >>>label_encoder = LabelEncoder()
         >>>for (colname, colval) in df.iteritems():
@@ -193,7 +185,10 @@ def generate_data_snippet(
         >>>for col in col_name:
         >>>    df[col] = label_encoder.fit_transform(df[col])
         >>>return df
-    >>>def replace_null(df):
+    >>>df = encodeing_df(df)
+        """
+        if replaceNull=="Yes":
+            replaceNan=f""">>>def replace_null(df):
         >>>col_nan = []
         >>>for (colname, colval) in df.iteritems():
         >>>    if df[colname].isnull().values.any() == True:
@@ -202,7 +197,10 @@ def generate_data_snippet(
         >>>    mean_value = df[col].mean()
         >>>    df[col].fillna(value=mean_value, inplace=True)
         >>>return df
-    >>>def scaling(df):
+    >>>df=replace_null(df)
+        """
+        if scale=='Yes':
+            scaleing=f""">>>def scaling(df):
         >>>x = df.iloc[:, :-1]  # Using all column except for the last column as X
         >>>y = df.iloc[:, -1]  # Selecting the last
         >>>m = x.max() - x.min()
@@ -216,23 +214,27 @@ def generate_data_snippet(
         >>>df_norm = (x-x.min())/(x.max()-x.min())
         >>>df_norm = pd.concat((df_norm, y), 1)
         >>>return df_norm
-    >>>def cal_mean(df):
-        >>>df_mean = df.mean(axis=0).mean(axis=0)
-        >>>return df_mean
-    >>>def cal_std(df):
-        >>>col_std = df.std()
-        >>>col = col_std.mean(axis=0)
-        >>>return col
-    >>>def pre_proses_data(df):
-        >>>df = encodeing_df(df)
-        >>>df = replace_null(df)
-        >>>std = cal_std(df)
-        >>>std = np.round(std, 5)
-        >>>mean = cal_mean(df)
-        >>>mean = np.round(mean, 5)
-        >>>df = scaling(df)
-        >>>return df
-    >>>df=pre_proses_data(df)
+    >>>df=scaling(df)
+            """
+
+    model_text_rep = repr(model)
+    if model_type =='Random Forest ':
+        model_import = model_imports["Random Forest"]
+    else:   
+        model_import = model_imports[model_type]
+        
+
+    snippet = f"""
+    >>> {model_import}
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> from sklearn.preprocessing import LabelEncoder
+    >>> from sklearn.tree import {model_type}
+    >>> from sklearn.metrics import accuracy_score, f1_score
+    >>> df = pd.read_csv(Data Frame Path)
+    { encod}
+    { replaceNan}
+    { scaleing}
     >>>>>> X = df.iloc[:, :-1]
     >>>>>> Y = df.iloc[:, -1]
     >>>>>> X_train, X_test, Y_train, Y_test = train_test_split(
@@ -253,6 +255,7 @@ def polynomial_degree_selector():
 
 def upload_data():
     with st.sidebar.header('1. Upload your CSV data'):
+        st.sidebar.write('Only classification Dataset Allowed')
         uploaded_file = st.sidebar.file_uploader(
             "Upload your input CSV file", type=["csv"])
     return uploaded_file
