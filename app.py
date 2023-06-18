@@ -1,6 +1,6 @@
 import numpy as np
 import streamlit as st
-import plost
+# import plost
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -240,18 +240,18 @@ if __name__ == "__main__":
                 df = df.drop_duplicates(['model'])
                 
 
-                plost.bar_chart(
-                    data=df,
-                    bar='model',
-                    value=('test_accuracy'),
-                    group='value',
-                    color='model',
-                    direction='horizontal'
-                )
-                plost.pie_chart(
-                    data=df,
-                    theta='duration',
-                    color='model')
+                # plost.bar_chart(
+                #     data=df,
+                #     bar='model',
+                #     value=('test_accuracy'),
+                #     group='value',
+                #     color='model',
+                #     direction='horizontal'
+                # )
+                # plost.pie_chart(
+                #     data=df,
+                #     theta='duration',
+                #     color='model')
                 model = display_best_model(df2)
                 model_type=model
                 snippet = generate_data_snippet(
