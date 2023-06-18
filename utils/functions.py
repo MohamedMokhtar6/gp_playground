@@ -287,7 +287,7 @@ def split_data(df, split_size):
 def encodeing_df(df):
     col_name = []
     label_encoder = LabelEncoder()
-    for (colname, colval) in df.iteritems():
+    for (colname, colval) in df.items():
         if colval.dtype == 'object' or colval.dtype == 'bool':
             col_name.append(colname)
     for col in col_name:
@@ -297,7 +297,7 @@ def encodeing_df(df):
 
 def replace_null(df):
     col_nan = []
-    for (colname, colval) in df.iteritems():
+    for (colname, colval) in df.items():
         if df[colname].isnull().values.any() == True:
             col_nan.append(colname)
 
@@ -320,7 +320,7 @@ def scaling(df):
         x = x.drop([i], axis=1)
 
     df_norm = (x-x.min())/(x.max()-x.min())
-    df_norm = pd.concat((df_norm, y), 1)
+    df_norm = pd.concat((df_norm, y),1)
 
     return df_norm
 

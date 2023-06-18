@@ -179,7 +179,7 @@ def generate_data_snippet(
             encod=f""">>>def encodeing_df(df):
         >>>col_name = []
         >>>label_encoder = LabelEncoder()
-        >>>for (colname, colval) in df.iteritems():
+        >>>for (colname, colval) in df.items():
         >>>    if colval.dtype == 'object':
         >>>        col_name.append(colname)
         >>>for col in col_name:
@@ -190,7 +190,7 @@ def generate_data_snippet(
         if replaceNull=="Yes":
             replaceNan=f""">>>def replace_null(df):
         >>>col_nan = []
-        >>>for (colname, colval) in df.iteritems():
+        >>>for (colname, colval) in df.items():
         >>>    if df[colname].isnull().values.any() == True:
         >>>        col_nan.append(colname)
         >>>for col in col_nan:
