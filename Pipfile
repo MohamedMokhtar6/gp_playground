@@ -17,6 +17,7 @@ plotly = "*"
 plotly-express = "*"
 streamlit-metrics = "*"
 pipreqs = "*"
+plost ="*"
 
 [dev-packages]
 
