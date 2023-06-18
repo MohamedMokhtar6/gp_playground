@@ -323,4 +323,4 @@ if __name__ == "__main__":
         else:
             st.info('Awaiting for CSV file to be uploaded.')
 
-    # footer()
+    footer()

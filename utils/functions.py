@@ -758,9 +758,9 @@ def footer():
     <span style='font-size: 0.875em;'>
      <img src="https://em-content.zobj.net/source/skype/289/red-heart_2764-fe0f.png" alt="heart" height= "10"/><a style='display: inline; text-align: left;' href="mailto:amr.atallahh147@gmail.com" target="_blank">  Amr Atallah</a></span>
     <span style='font-size: 0.875em;'>
-     <img src="https://em-content.zobj.net/source/skype/289/red-heart_2764-fe0f.png" alt="heart" height= "10"/><a style='display: inline; text-align: left;' href="mailto:mohamed01017715716@email.com" target="_blank">  Mohamed Khaled</a></span>
+     <img src="https://em-content.zobj.net/source/skype/289/red-heart_2764-fe0f.png" alt="heart" height= "10"/><a style='display: inline; text-align: left;' href="mailto:" target="_blank">  Mohamed Khaled</a></span>
     <span style='font-size: 0.875em;'>
-     <img src="https://em-content.zobj.net/source/skype/289/red-heart_2764-fe0f.png" alt="heart" height= "10"/><a style='display: inline; text-align: left;' href="mailto:mohamed01017715716@email.com" target="_blank">  Eid Khaled</a></span>
+     <img src="https://em-content.zobj.net/source/skype/289/red-heart_2764-fe0f.png" alt="heart" height= "10"/><a style='display: inline; text-align: left;' href="mailto:Eidk61857@gmail.com" target="_blank">  Eid Khaled</a></span>
     <span style='font-size: 0.875em;'>
      <img src="https://em-content.zobj.net/source/skype/289/red-heart_2764-fe0f.png" alt="heart" height= "10"/><a style='display: inline; text-align: left;' href="mailto:omarsaad698@gmail.com" target="_blank"> Omar Saad</a></span>
   
