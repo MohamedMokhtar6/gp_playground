@@ -1,6 +1,5 @@
 import numpy as np
 import streamlit as st
-from sklearn.datasets import load_diabetes
 import plost
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -266,14 +265,14 @@ if __name__ == "__main__":
         data_set = upload_data()
         if data_set is not None:
             df = pd.read_csv(data_set)
-            # empty_datafreame('test.csv')
+            # empty_datafreame('test2.csv')
             st.subheader(' Glimpse of dataset')
             st.write(df.head())
             (df, std, mean,Pre_Selector,encodeing,replaceNull,scale) = pre_Selector(df)
             submit = st.sidebar.button("submit")
             if submit == True:
                 # run_all_model(df)
-                df = pd.read_csv('test.csv')
+                df = pd.read_csv('test2.csv')
                 df = df.dropna()
                 df =df.loc[df['train_accuracy'] > df['test_accuracy']]
                 df = df.sort_values(["test_accuracy"], axis=0, ascending=False)
@@ -321,6 +320,7 @@ if __name__ == "__main__":
 
                 uplouded_data_body(X_train, X_test, Y_train,
                                    Y_test, model, model_type, df,Pre_Selector,encodeing,replaceNull,scale)
-
         else:
             st.info('Awaiting for CSV file to be uploaded.')
+
+    footer()
