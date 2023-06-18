@@ -208,7 +208,7 @@ if __name__ == "__main__":
     #         train_noise,
     #         test_noise,
     #     )
-    elif choise_data == 'The LittleGenius':
+    if choise_data == 'The LittleGenius':
         data_set = upload_data()
         if data_set is not None:
             selected_var = []
