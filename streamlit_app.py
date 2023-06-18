@@ -180,34 +180,34 @@ def uplouded_data_body(
 
 if __name__ == "__main__":
     choise_data = st.sidebar.radio(
-        "choise your Data", ('Make your Data', 'Upload your CSV file', 'The LittleGenius', 'BrainForce'))
+        "choise your Data", ( 'Upload your CSV file', 'The LittleGenius', 'BrainForce'))
 
-    if choise_data == 'Make your Data':
-        (
-            dataset,
-            n_classes,
-            model_type,
-            model,
-            x_train,
-            y_train,
-            x_test,
-            y_test,
-            degree,
-            train_noise,
-            test_noise,
-            n_samples,
-        ) = sidebar_controllers()
-        body(
-            x_train,
-            x_test,
-            y_train,
-            y_test,
-            degree,
-            model,
-            model_type,
-            train_noise,
-            test_noise,
-        )
+    # if choise_data == 'Make your Data':
+    #     (
+    #         dataset,
+    #         n_classes,
+    #         model_type,
+    #         model,
+    #         x_train,
+    #         y_train,
+    #         x_test,
+    #         y_test,
+    #         degree,
+    #         train_noise,
+    #         test_noise,
+    #         n_samples,
+    #     ) = sidebar_controllers()
+    #     body(
+    #         x_train,
+    #         x_test,
+    #         y_train,
+    #         y_test,
+    #         degree,
+    #         model,
+    #         model_type,
+    #         train_noise,
+    #         test_noise,
+    #     )
     elif choise_data == 'The LittleGenius':
         data_set = upload_data()
         if data_set is not None:
